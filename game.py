@@ -1,12 +1,11 @@
 import menu
 import snake_game
-
-a = 0
+flag1 = True
 while True:
-    if a > -1:
-        menu.menu_()
-        a +=1
-    if a > 0:
-        snake_game.main()
-        a -= 1
+    if flag1 == True:
+        menu.game_menu()
+        flag1 = False
+    if flag1 == False:
+        snake_game.SnakeGame()
+        flag1 = True
         
