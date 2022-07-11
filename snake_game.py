@@ -1,6 +1,7 @@
 import pygame
 import os
 import random
+import menu 
 
 BLACK = (0,0,0)
 WHITE = (250,250,250)
@@ -15,13 +16,10 @@ pygame.display.set_caption('sneak game')
 head_img = pygame.image.load(os.path.join('file_snake','white.png'))
 head = pygame.transform.scale(head_img,(20,20))
 
-
-
 flag1 = True
 flag2 = False
 flag3 = False
 flag4 = False
-
 
 def list_maker(list1):
     x,y = 40,40
@@ -56,7 +54,6 @@ def draw_window(FOOD_COUNT, FOOD, tail_list,snake):
         pygame.draw.rect(window,GREEN,tail)
     window.blit(head,(snake.x,snake.y))
     pygame.display.update()
-
 
 def snake_controll(snake,key_pressed,speed,snake_list):
     global flag1 
@@ -158,4 +155,7 @@ def SnakeGame():
         snake_controll(snake,key_pressed,speed,snake_list)
         snake_cordinate(snake,snake_list)
         draw_window(FOOD_COUNT,FOOD,tail_list,snake)
-    
+
+while True:
+    menu.game_menu()
+    SnakeGame()

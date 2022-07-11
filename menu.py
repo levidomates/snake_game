@@ -28,8 +28,8 @@ head = pygame.transform.scale(head_img,(20,20))
 def menu_draw_window(snake,tail_list):
     window.fill(BLACK)
     
-    arrow_left_text = arrow_left_font.render('>',1,RED)
-    arrow_right_text = arrow_right_font.render('<',1,RED)
+    arrow_left_text = arrow_left_font.render('>',1,GREEN)
+    arrow_right_text = arrow_right_font.render('<',1,GREEN)
     play_text = play_font.render('Play',1,WHITE)
     quit_text = quit_font.render('Quit',1,WHITE)
     a = 0
@@ -102,10 +102,5 @@ def game_menu():
         tp(snake)
         tail_location_create(tail_list,snake)
         snake_controll(snake,speed)
-        menu_draw_window(snake,tail_list)
         menu_arrow(keys_pressed)
-           
-
-        
-        
-
+        menu_draw_window(snake,tail_list)
