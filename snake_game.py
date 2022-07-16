@@ -1,161 +1,136 @@
 import pygame
-import os
+import os 
 import random
-import menu 
+import menu
+
+FPS = 60
 
 BLACK = (0,0,0)
 WHITE = (250,250,250)
 RED = (255,64,64)
 GREEN = (127,255,0)
 
-WIDTH, HEIGHT = 600,600
+WIDTH, HEIGHT = 600,620
 
-window = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption('sneak game')
+clock = pygame.time.Clock()
+
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('sneak_game')
 
 head_img = pygame.image.load(os.path.join('file_snake','white.png'))
 head = pygame.transform.scale(head_img,(20,20))
 
-flag1 = True
-flag2 = False
-flag3 = False
-flag4 = False
+snake_head = pygame.Rect(100,100,20,20)
+food = pygame.Rect(100,200,20,20)
 
-def list_maker(list1):
-    x,y = 40,40
-    while True:
-        list2 = []
-        list2.append(x)
-        list2.append(y)
-        list1.append(list2)
-        x += 20
-        if x == WIDTH - 20:
-            y += 20
-            x = 40
-        if y == HEIGHT - 20:
-            break
+class Snake():
 
-def tail_location_create(tail_list,snake,FOOD_COUNT):
-    if snake.x % 20 == 0 and snake.y % 20 == 0:
-        list_space = []
-        list_space.append(snake.x)
-        list_space.append(snake.y)
-        tail_list.append(list_space)
-    if len(tail_list) > FOOD_COUNT + 1:
-        tail_list.remove(tail_list[0])
+    def __init__(self,speed,flag,snake_head):
+        self.speed = speed
+        self.flag = flag
+        self.snake_head = snake_head
 
-def draw_window(FOOD_COUNT, FOOD, tail_list,snake):
+    def move(self,keys_pressed):
+        if snake_head.x % 20 == 0 and snake_head.y % 20 == 0:
+            if keys_pressed[pygame.K_w] and self.flag != 1:
+                self.flag = 0
+            if keys_pressed[pygame.K_s] and self.flag != 0:
+                self.flag = 1
+            if keys_pressed[pygame.K_d] and self.flag != 3:
+                self.flag = 2
+            if keys_pressed[pygame.K_a] and self.flag != 2:
+                self.flag = 3
+    
+        if self.flag == 0:
+            self.snake_head.y -= self.speed
+        if self.flag == 1:
+            self.snake_head.y += self.speed
+        if self.flag == 2:
+            self.snake_head.x += self.speed
+        if self.flag == 3:
+            self.snake_head.x -= self.speed
+
+        if self.snake_head.x > 580:
+            self.snake_head.x = 20
+        elif self.snake_head.x < 20:
+            self.snake_head.x = 580
+        if self.snake_head.y > 580:
+            self.snake_head.y = 20
+        elif self.snake_head.y < 20:
+            self.snake_head.y = 580
+
+class Food():
+
+    def __init__(self, food, food_list = []):
+        self.food = food 
+        self.food_list = food_list
+
+    def list_maker(self,):
+        x,y = 40,40
+        while True:
+            list2 = []
+            list2.append(x) ,list2.append(y) 
+            self.food_list.append(list2)
+            x += 20
+            if x == WIDTH - 20:
+                y += 20
+                x = 40
+            if y == HEIGHT - 20:
+                break
+
+    def food_create(self,):
+        list_space = random.choice(self.food_list)
+        self.food.x,self.food.y = list_space[0],list_space[1]
+
+class Tail():
+    def __init__(self,tail_list=[]):
+        self.tail_list = tail_list
+    def tail_list_maker(self,FOOD_COUNT):
+        if snake_head.x % 20 == 0 and snake_head.y % 20 == 0:
+            list_space = []
+            list_space.append(snake_head.x)
+            list_space.append(snake_head.y)
+            self.tail_list.append(list_space)
+        if len(self.tail_list) > FOOD_COUNT + 1:
+            self.tail_list.remove(self.tail_list[0])
+    def tail_location_create(self,FOOD_COUNT):
+        a = 0
+        while a < FOOD_COUNT + 1 and len(self.tail_list) > 0:
+            a += 1
+            tail_img = pygame.Rect(self.tail_list[len(self.tail_list)-a][0],self.tail_list[len(self.tail_list)-a][1],20,20)
+            pygame.draw.rect(window,GREEN,tail_img)
+
+def draw_window(snake,prey,tail,FOOD_COUNT):
     window.fill(BLACK)
-    pygame.draw.rect(window,RED,FOOD)
-    a = 0
-    while a < FOOD_COUNT + 1:
-        a += 1
-        tail = pygame.Rect(tail_list[len(tail_list)-a][0],tail_list[len(tail_list)-a][1],20,20)
-        pygame.draw.rect(window,GREEN,tail)
-    window.blit(head,(snake.x,snake.y))
+    pygame.draw.rect(window,RED,prey.food)
+    tail.tail_location_create(FOOD_COUNT)
+    window.blit(head,(snake.snake_head.x,snake.snake_head.y))
     pygame.display.update()
 
-def snake_controll(snake,key_pressed,speed,snake_list):
-    global flag1 
-    global flag2
-    global flag3 
-    global flag4
-
-    if snake.x % 20 == 0 and snake.y % 20 == 0:
-        if key_pressed[pygame.K_w] and snake_list[0][0] != snake_list[1][0]:
-            flag1 = True
-            flag2 = False
-            flag3 = False
-            flag4 = False
-        if key_pressed[pygame.K_s] and snake_list[0][0] != snake_list[1][0]:
-            flag1 = False
-            flag2 = True
-            flag3 = False
-            flag4 = False
-        if key_pressed[pygame.K_a] and snake_list[0][1] != snake_list[1][1]:
-            flag1 = False
-            flag2 = False
-            flag3 = True
-            flag4 = False
-        if key_pressed[pygame.K_d] and snake_list[0][1] != snake_list[1][1]:
-            flag1 = False
-            flag2 = False
-            flag3 = False
-            flag4 = True
-
-    if flag1 == True:
-        snake.y -= speed
-    if flag2 == True:
-        snake.y += speed
-    if flag3 == True:
-        snake.x -= speed
-    if flag4 == True:
-        snake.x += speed
-
-def tp(snake):
-
-    if snake.x > 599:
-        snake.x = 0
-    elif snake.x < -1:
-        snake.x = 600
-    if snake.y < -1:
-        snake.y = 600
-    elif snake.y > 599:
-        snake.y = 0
-
-def snake_cordinate(snake,snake_list):
-    free_list = []
-    free_list.append(snake.x)
-    free_list.append(snake.y)
-    snake_list.insert(0,free_list)
-
-def SnakeGame():
-
-    list1 = []
-    tail_list = []
-    food_list = [220,120]
-    snake_list = []
-    FPS = 60
-    FOOD_COUNT = 0
-    speed = 5
-    snake = pygame.Rect(100,100,20,20)
-    clock = pygame.time.Clock()
-    list_maker(list1)
+def main():
+    snake = Snake(5,2,snake_head)
+    prey = Food(food)
+    tail = Tail()
+    prey.list_maker()
+    FOOD_COUNT = 1
     run = True
-    
     while run:
         clock.tick(FPS)
-        FOOD = pygame.Rect(food_list[0],food_list[1],20,20)
-        
-        if snake.x == food_list[0] and snake.y == food_list[1]:
-            FOOD_COUNT += 1
-        if snake.x == food_list[0] and snake.y == food_list[1]:
-            while True:
-                food_list = []
-                food_list = random.choice(list1)
-                if food_list not in tail_list:
-                    break
-
-        list_space = []
-        for i in range(0,len(tail_list)-1):
-            list_space.append(tail_list[i])    
-        if [snake.x,snake.y] in list_space:
-            run = False
-        if len(snake_list) > 2:
-            snake_list.remove(snake_list[len(snake_list)-1])
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-
-        key_pressed = pygame.key.get_pressed()
-
-        tp(snake)    
-        tail_location_create(tail_list,snake,FOOD_COUNT)
-        snake_controll(snake,key_pressed,speed,snake_list)
-        snake_cordinate(snake,snake_list)
-        draw_window(FOOD_COUNT,FOOD,tail_list,snake)
+        keys_pressed = pygame.key.get_pressed()
+        if snake_head.x == food.x and snake_head.y == food.y:
+            FOOD_COUNT += 1
+            prey.food_create()
+        if [snake_head.x,snake_head.y] in tail.tail_list:
+            FOOD_COUNT = 1
+            run = False
+        tail.tail_list_maker(FOOD_COUNT)
+        draw_window(snake,prey,tail,FOOD_COUNT)
+        snake.move(keys_pressed)
 
 while True:
-    menu.game_menu()
-    SnakeGame()
+    menu.snake_menu()
+    main()
