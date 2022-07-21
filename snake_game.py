@@ -25,20 +25,32 @@ food = pygame.Rect(100,200,20,20)
 
 class Snake():
 
-    def __init__(self,speed,flag,snake_head):
+    def __init__(self,speed,flag,snake_head,snake_list=[[0,0],[0,0]]):
         self.speed = speed
         self.flag = flag
         self.snake_head = snake_head
+        self.snake_list = snake_list
+
+    def list_maker(self,):
+        space_list = []
+        space_list.append(snake_head.x)
+        space_list.append(snake_head.y)
+        self.snake_list.insert(0,space_list)
+
+        if len(self.snake_list) > 2:
+            self.snake_list.remove(self.snake_list[len(self.snake_list)-1])
+        print(self.snake_list)
 
     def move(self,keys_pressed):
+        self.list_maker()
         if snake_head.x % 20 == 0 and snake_head.y % 20 == 0:
-            if keys_pressed[pygame.K_w] and self.flag != 1:
+            if keys_pressed[pygame.K_w] and self.snake_list[0][0] != self.snake_list[1][0]:
                 self.flag = 0
-            if keys_pressed[pygame.K_s] and self.flag != 0:
+            if keys_pressed[pygame.K_s] and self.snake_list[0][0] != self.snake_list[1][0]:
                 self.flag = 1
-            if keys_pressed[pygame.K_d] and self.flag != 3:
+            if keys_pressed[pygame.K_d] and self.snake_list[0][1] != self.snake_list[1][1]:
                 self.flag = 2
-            if keys_pressed[pygame.K_a] and self.flag != 2:
+            if keys_pressed[pygame.K_a] and self.snake_list[0][1] != self.snake_list[1][1]:
                 self.flag = 3
     
         if self.flag == 0:
